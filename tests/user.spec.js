@@ -1,22 +1,35 @@
 import { test, expect } from '@playwright/test'
 
-test.only("Get Token", async ({ request }) => {
-    const userInfo = {
-        username: "emilys",
-        password: "emilyspass"
-    }
-
-    const response = await request.post("https://dummyjson.com/auth/login", {
-        data: userInfo,
+test("Get User Profile", async ({ request }) => {
+    const response = await request.get("/auth/me", {
         headers: {
-            "Content-type": "application/json; charset=UTF-8"
+            Authorization: `Bearer ${process.env.ACCESS_TOKEN}`
         }
     });
 
     expect(response.status()).toBe(200);
+
     const jsonData = await response.json();
+    expect(jsonData.firstName).toBe("Emily");
+    expect(jsonData.lastName).toBe("Johnson");
+    expect(jsonData.username).toBe("emilys");
+    expect(jsonData.email).toBe("emily.johnson@x.dummyjson.com");
+});
 
-    console.log(jsonData.accessToken);
+test.only("Get First Product ID & Retrieve the Product Details", async ({ request }) => {
+    const response = await request.get("/products");
+    const jsonData = await response.json();
+    const product_id = jsonData.products[0].id;
 
-    //eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpZCI6MSwidXNlcm5hbWUiOiJlbWlseXMiLCJlbWFpbCI6ImVtaWx5LmpvaG5zb25AeC5kdW1teWpzb24uY29tIiwiZmlyc3ROYW1lIjoiRW1pbHkiLCJsYXN0TmFtZSI6IkpvaG5zb24iLCJnZW5kZXIiOiJmZW1hbGUiLCJpbWFnZSI6Imh0dHBzOi8vZHVtbXlqc29uLmNvbS9pY29uL2VtaWx5cy8xMjgiLCJpYXQiOjE3ODg3NzYzMDYsImV4cCI6MTc4ODc3OTkwNn0.axDo5cOcnhCzJSKGrRAoO89UkXl6zBAe4_oxEwyHzd4
+    expect(response.status()).toBe(200);
+
+    const productResponse = await request.get(`/products/${product_id}`);
+    const productData = await productResponse.json();
+
+    expect(productResponse.status()).toBe(200);
+    expect(productData.id).toBe(1);
+    expect(productData.title).toBe("Essence Mascara Lash Princess");
+    expect(productData.brand).toBe("Essence");
+    expect(productData.category).toBe("beauty");
+    expect(productData.stock).toBe(99);
 });
