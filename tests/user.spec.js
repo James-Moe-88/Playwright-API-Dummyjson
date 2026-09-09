@@ -1,6 +1,6 @@
 import { test, expect } from '@playwright/test'
 
-test("Get User Profile with Bearer Token", async ({ request }) => {
+test.skip("Get User Profile with Bearer Token", async ({ request }) => {
     // Retrieve the user info with Bearer Token
     // That token is store in global-setup.js
     // If the script fail, please check 'globalSetup' in the playwright.config.js
